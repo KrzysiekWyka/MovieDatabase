@@ -7,6 +7,6 @@ import { UsersRepository } from './users.repository';
 @Module({
   imports: [TypegooseModule.forFeature([UserModel])],
   providers: [UsersService, UsersRepository],
-  exports: [UsersService]
+  exports: [UsersService, UsersRepository],
 })
 export class UsersModule {}
