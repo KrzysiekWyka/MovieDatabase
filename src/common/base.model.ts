@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class IdModel {
   @ApiProperty({ type: String })
-  _id?: mongoose.Types.ObjectId;
+  _id?: Types.ObjectId;
 }
 
 export abstract class BaseModel {
