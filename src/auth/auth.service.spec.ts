@@ -1,13 +1,21 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test} from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UsersRepository } from '../users/users.repository';
 import { Provider } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { when } from 'jest-when';
+import { JwtService } from '@nestjs/jwt';
+import { UserPlan } from '../users/user-plan.enum';
+import authConfig from '../auth/auth.config';
 
 jest.mock('bcryptjs');
 
+const JWT_SECRET = 'fooBar';
+const JWT_ISSUER = 'https://google.com/';
+const JWT_TTL = Number.MAX_SAFE_INTEGER;
+
 describe('AuthService', () => {
+  let jwtService: Partial<Record<keyof JwtService, jest.Mock>>;
   let usersRepository: Partial<Record<keyof UsersRepository, jest.Mock>>;
   let sut: AuthService;
 
@@ -16,12 +24,26 @@ describe('AuthService', () => {
       provide: UsersRepository,
       useValue: { findOneByUsername: jest.fn() },
     };
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService, fakeUsersRepository],
+
+    const fakeJwtService: Provider = {
+      provide: JwtService,
+      useValue: { sign: jest.fn() },
+    };
+
+    const fakeConfig: Provider = {
+      provide: authConfig.KEY,
+      useValue: {
+        jwt: { secret: JWT_SECRET, issuer: JWT_ISSUER, ttl: JWT_TTL },
+      },
+    };
+
+    const module = await Test.createTestingModule({
+      providers: [AuthService, fakeUsersRepository, fakeJwtService, fakeConfig],
     }).compile();
 
     sut = module.get<AuthService>(AuthService);
     usersRepository = module.get<UsersRepository, unknown>(UsersRepository);
+    jwtService = module.get<JwtService, unknown>(JwtService);
   });
 
   describe('validateUser', () => {
@@ -77,6 +99,38 @@ describe('AuthService', () => {
 
       expect(result).toEqual(restUser);
       expect(compareMock).toHaveBeenCalledWith(password, returnedUser.password);
+    });
+  });
+
+  describe('login', () => {
+    const loginArgs = {
+      internalId: Number.MAX_SAFE_INTEGER,
+      name: 'fooBar',
+      plan: UserPlan.BASIC,
+    };
+
+    it('should generate jwt token for specified user', async () => {
+      const token = 'token123';
+
+      when(jwtService.sign)
+        .calledWith(
+          {
+            userId: loginArgs.internalId,
+            name: loginArgs.name,
+            role: loginArgs.plan,
+          },
+          {
+            secret: JWT_SECRET,
+            issuer: JWT_ISSUER,
+            expiresIn: JWT_TTL,
+            subject: `${loginArgs.internalId}`,
+          },
+        )
+        .mockReturnValueOnce(token);
+
+      const result = await sut.login(loginArgs);
+
+      expect(result).toEqual({ token: token });
     });
   });
 });
