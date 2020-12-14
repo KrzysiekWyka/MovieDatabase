@@ -66,6 +66,7 @@
     "jest": "26.4.2",
     "jest-when": "^3.0.1",
     "mongodb-memory-server": "^6.9.2",
+    "nock": "^13.0.5",
     "prettier": "^1.19.1",
     "supertest": "^4.0.2",
     "ts-jest": "26.2.0",
