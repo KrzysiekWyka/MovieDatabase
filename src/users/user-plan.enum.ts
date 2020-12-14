@@ -1,4 +1,4 @@
 export enum UserPlan {
-  BASIC = 'BASIC',
-  PREMIUM = 'PREMIUM'
+  BASIC = 'basic',
+  PREMIUM = 'premium',
 }
