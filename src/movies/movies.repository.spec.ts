@@ -60,20 +60,34 @@ describe('MoviesRepository', () => {
     });
   });
 
-  describe('createOne', () => {
-    it('should throws ValidationError when provided model is incorrect', async () => {
-      await expect(sut.createOne({ foo: 'bar' } as any)).rejects.toThrow(
-        Error.ValidationError,
-      );
-    });
-
+  describe('createOrUpdate', () => {
     it('should create new document & return it', async () => {
-      const result = await sut.createOne(sampleMovieModel);
+      const result = await sut.createOrUpdate(sampleMovieModel);
 
       expect(result).toEqual({
         ...sampleMovieModel,
         _id: expect.any(Types.ObjectId),
         __v: 0,
+      });
+
+      const dbItems = await helpers.findMany({});
+
+      expect(dbItems).toEqual([result]);
+    });
+
+    it('should update existing document & return it', async () => {
+      const insertedMovie = await helpers.save(sampleMovieModel);
+
+      const newDirectory = 'director123';
+
+      const result = await sut.createOrUpdate({
+        title: insertedMovie.title,
+        directory: newDirectory,
+      });
+
+      expect(result).toEqual({
+        ...insertedMovie,
+        directory: newDirectory,
       });
 
       const dbItems = await helpers.findMany({});

@@ -3,7 +3,7 @@ import { MovieModel } from './movie.model';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { CreateQuery } from 'mongoose';
+import { UpdateQuery } from 'mongoose';
 
 @Injectable()
 export class MoviesRepository extends BaseRepository<MovieModel> {
@@ -20,9 +20,13 @@ export class MoviesRepository extends BaseRepository<MovieModel> {
       .exec();
   }
 
-  async createOne(data: CreateQuery<MovieModel>) {
-    const result = await this.mongooseModel.create(data);
-
-    return result.toObject();
+  createOrUpdate(data: UpdateQuery<MovieModel>) {
+    return this.mongooseModel
+      .findOneAndUpdate({ title: data.title }, data, {
+        upsert: true,
+        new: true,
+      })
+      .lean()
+      .exec();
   }
 }
