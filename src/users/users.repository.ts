@@ -3,6 +3,7 @@ import { BaseRepository } from '../common/base.repository';
 import { UserModel } from './user.model';
 import { InjectModel } from 'nestjs-typegoose';
 import { ReturnModelType } from '@typegoose/typegoose';
+import { UpdateQuery } from 'mongoose';
 
 @Injectable()
 export class UsersRepository extends BaseRepository<UserModel> {
@@ -35,6 +36,12 @@ export class UsersRepository extends BaseRepository<UserModel> {
           lastMovieAddedAt: new Date(),
         },
       )
+      .exec();
+  }
+
+  updateUserById(id: string, model: UpdateQuery<UserModel>) {
+    return this.mongooseModel
+      .updateOne({ _id: BaseRepository.toObjectId(id) }, model)
       .exec();
   }
 }

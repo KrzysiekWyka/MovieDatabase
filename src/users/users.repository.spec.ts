@@ -125,4 +125,34 @@ describe('UsersRepository', () => {
       ]);
     });
   });
+
+  describe('updateUserById', () => {
+    let insertedUser: DocumentType<UserModel>;
+
+    beforeEach(async () => {
+      insertedUser = await createSampleUser();
+    });
+
+    it('should skip update when specified user could not be found', async () => {
+      await sut.updateUserById(new Types.ObjectId().toString(), {
+        name: 'fooBar',
+      });
+
+      const dbResult = await helpers.findMany({});
+
+      expect(dbResult).toEqual([insertedUser]);
+    });
+
+    it('should update specified user', async () => {
+      const newName = 'name123';
+
+      await sut.updateUserById(insertedUser._id.toString(), {
+        name: newName,
+      });
+
+      const dbResult = await helpers.findMany({});
+
+      expect(dbResult).toEqual([{ ...insertedUser, name: newName }]);
+    });
+  });
 });
