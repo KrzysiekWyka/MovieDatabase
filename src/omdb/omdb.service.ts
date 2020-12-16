@@ -14,7 +14,7 @@ interface OmdbResponse {
   Title?: string;
   Released?: string;
   Genre?: string;
-  Directory?: string;
+  Director?: string;
   [key: string]: unknown;
 }
 

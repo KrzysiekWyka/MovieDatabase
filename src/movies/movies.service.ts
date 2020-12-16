@@ -32,7 +32,7 @@ export class MoviesService {
     return this.moviesRepository.createOrUpdate({
       title: result.Title,
       genre: result.Genre,
-      directory: result.Directory,
+      director: result.Director,
       releasedDate: new Date(result.Released),
     });
   }

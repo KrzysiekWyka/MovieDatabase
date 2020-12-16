@@ -41,7 +41,7 @@ describe('MoviesRepository', () => {
     title: 'foo',
     releasedDate: new Date(),
     genre: 'bar',
-    directory: 'fooBar',
+    director: 'fooBar',
   };
 
   describe('findOneByTitle', () => {
@@ -78,16 +78,16 @@ describe('MoviesRepository', () => {
     it('should update existing document & return it', async () => {
       const insertedMovie = await helpers.save(sampleMovieModel);
 
-      const newDirectory = 'director123';
+      const newDirector = 'director123';
 
       const result = await sut.createOrUpdate({
         title: insertedMovie.title,
-        directory: newDirectory,
+        director: newDirector,
       });
 
       expect(result).toEqual({
         ...insertedMovie,
-        directory: newDirectory,
+        director: newDirector,
       });
 
       const dbItems = await helpers.findMany({});

@@ -74,14 +74,14 @@ describe('MoviesService', () => {
       const movieInfo = {
         Title: title,
         Genre: 'genre123',
-        Directory: 'directory123',
+        Director: 'director123',
         Released: new Date().getTime(),
       };
 
       const insertedMovie = {
         title: title,
         genre: movieInfo.Genre,
-        directory: movieInfo.Directory,
+        director: movieInfo.Director,
         releasedDate: new Date(movieInfo.Released),
         _id: 'movie123',
       };

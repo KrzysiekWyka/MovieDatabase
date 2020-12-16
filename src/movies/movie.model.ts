@@ -27,5 +27,5 @@ export class MovieModel extends BaseModel {
   @IsNotEmpty()
   @ApiProperty()
   @prop({ required: true })
-  directory!: string;
+  director!: string;
 }
