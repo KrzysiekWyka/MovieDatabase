@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -17,13 +17,17 @@ import { ForbiddenDto } from '../common/forbidden.dto';
 import { NotFoundDto } from '../common/not-found.dto';
 import { ServiceUnavailableDto } from '../common/service-unavailable.dto';
 import { CreateMovieDto } from './create-movie.dto';
+import { MoviesRepository } from './movies.repository';
 
 @ApiBearerAuth()
 @ApiTags('movies')
 @UseGuards(AuthGuard('jwt'))
 @Controller('movies')
 export class MoviesController {
-  constructor(private readonly moviesService: MoviesService) {}
+  constructor(
+    private readonly moviesService: MoviesService,
+    private readonly movieRepository: MoviesRepository,
+  ) {}
 
   @ApiOperation({ description: 'Create movie' })
   @ApiOkResponse({ description: 'Created movie', type: MovieModel })
@@ -49,5 +53,16 @@ export class MoviesController {
       createMovieDto.title,
       req.user.userId,
     );
+  }
+
+  @ApiOperation({ description: 'List movies' })
+  @ApiOkResponse({ description: 'Movies', isArray: true, type: MovieModel })
+  @ApiUnauthorizedResponse({
+    description: 'Username or password are incorrect',
+    type: UnauthorizedDto,
+  })
+  @Get()
+  listMovies() {
+    return this.movieRepository.findAll();
   }
 }
