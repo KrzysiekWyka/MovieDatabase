@@ -18,6 +18,20 @@
 3. Make `.env` file in root dir and copy content from `.env.example` (`$ cp .env.example .env`)
 4. Insert sample user (Basic Thomas and Premium Jim) using `$ npm run loadSeeds`
 
+### Seed users
+```json
+{
+    "plan": "basic",
+    "username": "basic-thomas",
+    "password": "sR-_pcoow-27-6PAwCD8"
+},
+{
+    "plan": "premium",
+    "username": "premium-jim",
+    "password": "GBLtTyq3E_UNjFnpo9m6"
+}
+```
+
 ## Running the app
 
 ```bash
@@ -35,5 +49,5 @@ $ npm run start:prod
 
 ```bash
 # unit tests
-$ npm run test
+$ npm test
 ```
