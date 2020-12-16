@@ -16,7 +16,7 @@ export class UserModel extends BaseModel {
   @IsInt()
   @IsNotEmpty()
   @ApiProperty({ type: 'integer' })
-  @prop({ required: true })
+  @prop({ required: true, unique: true })
   internalId!: number;
 
   @IsString()
