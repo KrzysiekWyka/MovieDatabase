@@ -5,6 +5,7 @@ import { ForbiddenException, Provider } from '@nestjs/common';
 import usersConfig from './users.config';
 import { when } from 'jest-when';
 import { UserPlan } from './user-plan.enum';
+import { UserModel } from './user.model';
 
 const BASIC_PLAN_MONTHLY_LIMIT = 5;
 const ONE_MONTH_IN_MS = 2629800000;
@@ -37,6 +38,12 @@ describe('UsersService', () => {
   });
 
   const userId = 'user123';
+  const now = new Date();
+
+  const recordFindOneById = (user: Partial<UserModel>) =>
+    when(usersRepository.findOneById)
+      .calledWith(userId, 'plan addedMoviesInMonthCount lastMovieAddedAt')
+      .mockResolvedValueOnce(user);
 
   describe('checkUserLimitOrThrows', () => {
     it('should throw ForbiddenException when specified user could not be found', async () => {
@@ -46,23 +53,20 @@ describe('UsersService', () => {
     });
 
     it('should be fulfilled when specified user has premium plan', async () => {
-      when(usersRepository.findOneById)
-        .calledWith(userId, 'plan addedMoviesInMonthCount lastMovieAddedAt')
-        .mockResolvedValueOnce({ plan: UserPlan.PREMIUM });
+      recordFindOneById({ plan: UserPlan.PREMIUM });
 
       await expect(sut.checkUserLimitOrThrows(userId)).resolves.not.toThrow();
+
       expect(usersRepository.incrementUserMovieLimit).not.toHaveBeenCalled();
     });
 
     describe('user has basic plan', () => {
       it('should throw ForbiddenException when specified user reach limit & cannot reset counter', async () => {
-        when(usersRepository.findOneById)
-          .calledWith(userId, 'plan addedMoviesInMonthCount lastMovieAddedAt')
-          .mockResolvedValueOnce({
-            plan: UserPlan.BASIC,
-            addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT,
-            lastMovieAddedAt: new Date(),
-          });
+        recordFindOneById({
+          plan: UserPlan.BASIC,
+          addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT,
+          lastMovieAddedAt: now,
+        });
 
         await expect(sut.checkUserLimitOrThrows(userId)).rejects.toThrow(
           ForbiddenException,
@@ -70,26 +74,20 @@ describe('UsersService', () => {
       });
 
       it('should be fulfilled when user did not reach limit', async () => {
-        when(usersRepository.findOneById)
-          .calledWith(userId, 'plan addedMoviesInMonthCount lastMovieAddedAt')
-          .mockResolvedValueOnce({
-            plan: UserPlan.BASIC,
-            addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT - 1,
-          });
+        recordFindOneById({
+          plan: UserPlan.BASIC,
+          addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT - 1,
+        });
 
         await expect(sut.checkUserLimitOrThrows(userId)).resolves.not.toThrow();
       });
 
       it('should be fulfilled when user reached limit by in different month', async () => {
-        const now = new Date();
-
-        when(usersRepository.findOneById)
-          .calledWith(userId, 'plan addedMoviesInMonthCount lastMovieAddedAt')
-          .mockResolvedValueOnce({
-            plan: UserPlan.BASIC,
-            addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT,
-            lastMovieAddedAt: new Date(now.getTime() - ONE_MONTH_IN_MS),
-          });
+        recordFindOneById({
+          plan: UserPlan.BASIC,
+          addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT,
+          lastMovieAddedAt: new Date(now.getTime() - ONE_MONTH_IN_MS),
+        });
 
         await expect(sut.checkUserLimitOrThrows(userId)).resolves.not.toThrow();
       });
@@ -98,12 +96,10 @@ describe('UsersService', () => {
 
   describe('incrementAndResetUserLimitOrThrows', () => {
     it('should skip increment and reset limit process when specified user has premium plan', async () => {
-      when(usersRepository.findOneById)
-        .calledWith(userId, 'plan addedMoviesInMonthCount lastMovieAddedAt')
-        .mockResolvedValueOnce({
-          plan: UserPlan.PREMIUM,
-          addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT - 1,
-        });
+      recordFindOneById({
+        plan: UserPlan.PREMIUM,
+        addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT - 1,
+      });
 
       const result = await sut.incrementAndResetUserLimitOrThrows(userId);
 
@@ -114,15 +110,11 @@ describe('UsersService', () => {
     });
 
     it('should reset limit when specified user has last added movie in different month', async () => {
-      const now = new Date();
-
-      when(usersRepository.findOneById)
-        .calledWith(userId, 'plan addedMoviesInMonthCount lastMovieAddedAt')
-        .mockResolvedValueOnce({
-          plan: UserPlan.BASIC,
-          addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT,
-          lastMovieAddedAt: new Date(now.getTime() - ONE_MONTH_IN_MS),
-        });
+      recordFindOneById({
+        plan: UserPlan.BASIC,
+        addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT,
+        lastMovieAddedAt: new Date(now.getTime() - ONE_MONTH_IN_MS),
+      });
 
       const result = await sut.incrementAndResetUserLimitOrThrows(userId);
 
@@ -135,12 +127,10 @@ describe('UsersService', () => {
     });
 
     it('should increment user movie limit when specified user can add movie', async () => {
-      when(usersRepository.findOneById)
-        .calledWith(userId, 'plan addedMoviesInMonthCount lastMovieAddedAt')
-        .mockResolvedValueOnce({
-          plan: UserPlan.BASIC,
-          addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT - 1,
-        });
+      recordFindOneById({
+        plan: UserPlan.BASIC,
+        addedMoviesInMonthCount: BASIC_PLAN_MONTHLY_LIMIT - 1,
+      });
 
       const result = await sut.incrementAndResetUserLimitOrThrows(userId);
 

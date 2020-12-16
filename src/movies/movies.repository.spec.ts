@@ -5,7 +5,7 @@ import { Provider } from '@nestjs/common';
 import { getModelToken } from 'nestjs-typegoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MoviesRepository } from './movies.repository';
-import { Error, Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 describe('MoviesRepository', () => {
   let helpers: utils.Helpers;
