@@ -32,6 +32,9 @@ export class MoviesRepository extends BaseRepository<MovieModel> {
 
   // TODO: Add pagination
   findAll() {
-    return this.mongooseModel.find({}).sort({ createdAt: -1 });
+    return this.mongooseModel
+      .find({})
+      .sort({ createdAt: -1 })
+      .exec();
   }
 }
