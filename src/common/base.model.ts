@@ -6,7 +6,7 @@ export class IdModel {
   _id?: Types.ObjectId;
 }
 
-export abstract class BaseModel {
+export abstract class BaseModel extends IdModel {
   @ApiProperty()
   __v?: string;
 
