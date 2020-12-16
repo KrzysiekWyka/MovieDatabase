@@ -16,7 +16,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthLoginDto, AuthLoginResponseDto } from './auth-login.dto';
-import { UnauthorizedDto } from '../common/unauthorized.dto';
+import { UnauthorizedDto } from '../common/dtos/unauthorized.dto';
 
 @ApiTags('auth')
 @Controller('auth')

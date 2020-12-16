@@ -12,10 +12,10 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { MoviesService } from './movies.service';
 import { MovieModel } from './movie.model';
-import { UnauthorizedDto } from '../common/unauthorized.dto';
-import { ForbiddenDto } from '../common/forbidden.dto';
-import { NotFoundDto } from '../common/not-found.dto';
-import { ServiceUnavailableDto } from '../common/service-unavailable.dto';
+import { UnauthorizedDto } from '../common/dtos/unauthorized.dto';
+import { ForbiddenDto } from '../common/dtos/forbidden.dto';
+import { NotFoundDto } from '../common/dtos/not-found.dto';
+import { ServiceUnavailableDto } from '../common/dtos/service-unavailable.dto';
 import { CreateMovieDto } from './create-movie.dto';
 import { MoviesRepository } from './movies.repository';
 
