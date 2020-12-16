@@ -37,6 +37,8 @@ describe('UsersRepository', () => {
     sut = module.get<UsersRepository>(UsersRepository);
   });
 
+  afterAll(async () => utils.closeDBConnection(UserModel));
+
   const createSampleUser = () =>
     helpers.save({
       name: 'foo',
