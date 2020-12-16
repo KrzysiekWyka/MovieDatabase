@@ -1,4 +1,4 @@
-import { Test} from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UsersRepository } from '../users/users.repository';
 import { Provider } from '@nestjs/common';
@@ -7,6 +7,7 @@ import { when } from 'jest-when';
 import { JwtService } from '@nestjs/jwt';
 import { UserPlan } from '../users/user-plan.enum';
 import authConfig from '../auth/auth.config';
+import { Types } from 'mongoose';
 
 jest.mock('bcryptjs');
 
@@ -104,6 +105,7 @@ describe('AuthService', () => {
 
   describe('login', () => {
     const loginArgs = {
+      _id: new Types.ObjectId(),
       internalId: Number.MAX_SAFE_INTEGER,
       name: 'fooBar',
       plan: UserPlan.BASIC,
@@ -115,6 +117,7 @@ describe('AuthService', () => {
       when(jwtService.sign)
         .calledWith(
           {
+            sub: loginArgs._id.toString(),
             userId: loginArgs.internalId,
             name: loginArgs.name,
             role: loginArgs.plan,
@@ -123,7 +126,6 @@ describe('AuthService', () => {
             secret: JWT_SECRET,
             issuer: JWT_ISSUER,
             expiresIn: JWT_TTL,
-            subject: `${loginArgs.internalId}`,
           },
         )
         .mockReturnValueOnce(token);

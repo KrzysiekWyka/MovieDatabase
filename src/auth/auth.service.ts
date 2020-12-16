@@ -28,9 +28,10 @@ export class AuthService {
     return !isPasswordCorrect ? undefined : _.omit(user, 'password');
   }
 
-  async login(user: Pick<UserModel, 'internalId' | 'name' | 'plan'>) {
+  async login(user: Pick<UserModel, 'internalId' | 'name' | 'plan' | '_id'>) {
     return {
       token: this.generateJwtToken({
+        sub: user._id.toString(),
         userId: user.internalId,
         name: user.name,
         role: user.plan,
@@ -38,12 +39,11 @@ export class AuthService {
     };
   }
 
-  private generateJwtToken<T extends { userId: number }>(data: T) {
+  private generateJwtToken<T extends { sub: string }>(data: T) {
     return this.jwtService.sign(data, {
       secret: this.config.jwt.secret,
       issuer: this.config.jwt.issuer,
       expiresIn: this.config.jwt.ttl,
-      subject: `${data.userId}`,
     });
   }
 
