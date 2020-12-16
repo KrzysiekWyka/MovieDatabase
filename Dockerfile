@@ -1,4 +1,4 @@
-FROM node:14.15-alpine AS builder
+FROM node:14.15-buster AS builder
 
 WORKDIR /app
 COPY package* ./
@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build \
     && npm prune --production
 
-FROM node:14.15-alpine
+FROM node:14.15-buster
 
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
