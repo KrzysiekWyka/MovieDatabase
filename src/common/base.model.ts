@@ -8,7 +8,7 @@ export class IdModel {
 
 export abstract class BaseModel extends IdModel {
   @ApiProperty()
-  __v?: string;
+  __v?: number;
 
   @ApiProperty({ type: String, format: 'date-time' })
   createdAt?: Readonly<Date>;
