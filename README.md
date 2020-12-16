@@ -5,6 +5,10 @@
 * [Nest](https://github.com/nestjs/nest)
 * [MongoDB](https://www.mongodb.com/)
 
+## Doc
+
+Visit `http://localhost:3000/swagger` 
+
 ## TODO
 
 * Pagination to `GET /movies` action
